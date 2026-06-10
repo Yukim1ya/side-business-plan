@@ -29,18 +29,19 @@
 ## パイプライン全体図
 
 ```
-将軍: new_blog_article.sh を実行 → 家老に自動送信
+将軍: new_blog_article.sh --topic "テーマ" を実行 → 家老に自動送信
         │
         ▼
 【Phase 1: 企画】
-家老 → 足軽A: 企画案作成
+家老 → 足軽A: テーマをもとに企画案を自律作成
+             （topic_area・対象読者・構成・差別化を足軽が決定）
              ↓
         足軽B: 一次レビュー（NG → 足軽Aに差し戻し）
              ↓ OK
         軍師: 企画レビュー（revision_needed → 足軽Aに再依頼）
              ↓ approved
 【Phase 2: 執筆】
-家老 → 足軽C: 記事執筆
+家老 → 足軽C: 承認済み企画案をもとに記事執筆
              ↓
         足軽D: 一次レビュー（NG → 足軽Cに差し戻し）
              ↓ OK
@@ -55,34 +56,26 @@
 
 ---
 
-## 使い方（1コマンドで完結）
+## 使い方（テーマを渡すだけ）
 
-`multi-agent-shogun` リポジトリで以下を実行するだけで、Steps 1〜3が自動化される。
+`multi-agent-shogun` リポジトリで以下を実行する。**指定するのはテーマのみ。**
 
 ```bash
-bash scripts/new_blog_article.sh \
-  --topic "Splunk で Kerberoasting を検知する" \
-  --type ad_attack \
-  --reader "Blue Team のセキュリティエンジニア（Splunk導入済み環境）" \
-  --notes "EventID 4769 を中心に解説。SPLクエリを必ず含める。"
+bash scripts/new_blog_article.sh --topic "Splunk で Kerberoasting を検知する"
 ```
+
+```bash
+bash scripts/new_blog_article.sh --topic "Nutanix CE の初期セットアップ手順"
+```
+
+topic_area・対象読者・記事構成・ハッシュタグは、企画作成足軽がテーマをもとに自律的に決定する。
 
 実行すると以下が自動で行われる:
 1. `queue/tasks/cmd_blog_XXX.yaml` を自動採番して作成
 2. 家老のinboxに起動メッセージを送信
 3. 進捗確認コマンドを表示
 
-### `--type` の選び方
-
-| 値 | 使う場面 |
-|---|---|
-| `splunk` | SPLクエリ・検知ルール・ダッシュボード |
-| `ad_attack` | Kerberoasting・Pass-the-Hash・Golden Ticket 等の検知と対策 |
-| `nutanix` | Nutanix CE の構築・運用・トラブルシュート |
-| `riss` | RISS試験対策・過去問解説・午後問の解き方 |
-| `general` | 上記に当てはまらない汎用セキュリティ・IT話題 |
-
-### 進捗確認（Step 4）
+### 進捗確認
 
 ```bash
 cat dashboard.md
@@ -96,21 +89,32 @@ cat dashboard.md
 
 ### Phase 1-A: 企画案作成（足軽）
 
-足軽が以下の形式で企画案を出力する:
+足軽はテーマだけを受け取り、以下を**自律的に決定**して企画案を作成する:
+
+| 決定項目 | 説明 |
+|---------|------|
+| `topic_area` | テーマに最も近い領域（splunk / ad_attack / nutanix / riss / general） |
+| `target_reader` | 誰が読むと最も価値があるかを具体的に定義 |
+| `title` | 検索キーワードを含む具体的なタイトル案 |
+| `outline` | 読者が得るものを最大化する記事構成 |
+| `differentiation` | 既存記事との差別化ポイント |
+| `hashtags` | note.com で発見されやすいタグ |
+
+企画案のアウトプット形式:
 
 ```yaml
 proposal:
   title: "Splunk で Kerberoasting を検知する — EventID 4769 の活用法"
   topic_area: "ad_attack"
   target_reader: "Splunk 導入済み環境の Blue Team エンジニア"
-  hook: "Kerberoasting は検知が難しいと言われるが、EventID 4769 を正しく絞り込めば現実的に検知できる。本記事では実践的なSPLクエリを紹介する。"
+  hook: "Kerberoasting は検知が難しいと言われるが、EventID 4769 を正しく絞り込めば現実的に検知できる。"
   outline:
     - "## Kerberoasting とは（攻撃の仕組みを簡潔に）"
     - "## 検知に使う EventID 4769 の見方"
     - "## SPL クエリで検知する"
     - "## 誤検知を減らすチューニング"
     - "## まとめ"
-  differentiation: "既存記事はKerberoastingの攻撃手順解説が多い。本記事はBlue Team視点で誤検知チューニングまで踏み込む点が差別化。"
+  differentiation: "Blue Team視点で誤検知チューニングまで踏み込む点が差別化"
   estimated_chars: 2500
   hashtags:
     - "#Splunk"
@@ -136,38 +140,7 @@ proposal:
 
 ### Phase 2-A: 記事執筆（足軽）
 
-承認済み企画案を元に、以下の形式で記事を執筆する:
-
-```markdown
-# Splunk で Kerberoasting を検知する — EventID 4769 の活用法
-
-Kerberoasting は…（導入文3〜5行）
-
-## Kerberoasting とは
-…
-
-## 検知に使う EventID 4769 の見方
-…
-
-## SPL クエリで検知する
-
-```splunk
-index=windows EventCode=4769
-  Ticket_Encryption_Type=0x17
-| stats count by src_ip, Account_Name
-| where count > 5
-```
-
-## 誤検知を減らすチューニング
-…
-
-## まとめ
-- EventID 4769 の Encryption_Type=0x17 が Kerberoasting の主要シグネチャ
-- count > 5 のしきい値で誤検知を大幅削減できる
-- 定期的なサービスアカウント棚卸しとセットで運用する
-
-#Splunk #ActiveDirectory #セキュリティ #BlueTeam
-```
+承認済み企画案を元に記事を執筆する（フォーマット仕様は `context/tech_blog.md` 参照）。
 
 ### Phase 2-B: 記事一次レビュー（別の足軽）
 
@@ -201,13 +174,9 @@ index=windows EventCode=4769
 2. 元の足軽（または別の足軽）が修正を実施
 3. 再度レビューフローへ
 
-差し戻しは何回でも発生しうる。軍師の指摘が明確なため、通常2回以内で承認される。
-
 ---
 
 ## 記事の保存場所
-
-完成した記事は以下に保存される:
 
 ```
 side-business-plan/
@@ -217,18 +186,17 @@ side-business-plan/
     └── ...
 ```
 
-GitHub URL は `dashboard.md` の完了記録に残る。
-note.com への実際の投稿は手動で行う（コピー貼り付け）。
+note.com への実際の投稿は手動で行う（GitHub の `.md` ファイルをコピー貼り付け）。
 
 ---
 
 ## よくある質問
 
 **Q. 足軽が何人必要？**  
-1本の記事に最低4名（企画作成・企画レビュー・記事執筆・記事レビュー）。並行して別の記事を進める場合はさらに必要。
+1本の記事に最低4名（企画作成・企画レビュー・記事執筆・記事レビュー）。
 
 **Q. 記事1本の生成にどれくらいかかる？**  
-差し戻しなしの場合、30〜60分。差し戻しが1回発生すると+15〜30分。
+差し戻しなしの場合、30〜60分。
 
-**Q. note.com への投稿は自動化できる？**  
-現時点では自動化していない。GitHub に上がった `.md` ファイルをコピーして note のエディタに貼り付ける。
+**Q. topic_area などを自分で指定したい場合は？**  
+`queue/tasks/cmd_blog_XXX.yaml` を直接編集してから家老に送信すれば上書き可能。
