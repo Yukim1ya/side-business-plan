@@ -29,7 +29,7 @@
 ## パイプライン全体図
 
 ```
-将軍: cmd_XXX.yaml を作成 → 家老に送信
+将軍: new_blog_article.sh を実行 → 家老に自動送信
         │
         ▼
 【Phase 1: 企画】
@@ -55,52 +55,24 @@
 
 ---
 
-## 使い方（将軍視点）
+## 使い方（1コマンドで完結）
 
-### Step 1: コマンドYAMLを作成する
-
-`multi-agent-shogun` リポジトリで以下を実行:
+`multi-agent-shogun` リポジトリで以下を実行するだけで、Steps 1〜3が自動化される。
 
 ```bash
-# テンプレートをコピー
-cp templates/cmd_tech_blog.yaml queue/tasks/cmd_050.yaml
+bash scripts/new_blog_article.sh \
+  --topic "Splunk で Kerberoasting を検知する" \
+  --type ad_attack \
+  --reader "Blue Team のセキュリティエンジニア（Splunk導入済み環境）" \
+  --notes "EventID 4769 を中心に解説。SPLクエリを必ず含める。"
 ```
 
-### Step 2: YAMLの `article_request` を埋める
+実行すると以下が自動で行われる:
+1. `queue/tasks/cmd_blog_XXX.yaml` を自動採番して作成
+2. 家老のinboxに起動メッセージを送信
+3. 進捗確認コマンドを表示
 
-```yaml
-article_request:
-  topic: "Splunk で Kerberoasting を検知する"
-  topic_area: "ad_attack"
-  target_reader: "Blue Team のセキュリティエンジニア（Splunk導入済み環境）"
-  notes: "EventID 4769 を中心に解説。SPLクエリを必ず含める。"
-```
-
-### Step 3: 家老に送信する
-
-```bash
-bash scripts/inbox_write.sh karo "cmd_050を書いた。実行せよ。" cmd_new shogun
-```
-
-### Step 4: 完了を待つ
-
-家老が `dashboard.md` を更新したら完了。`github_url` に記事のURLが記録される。
-
----
-
-## コマンドYAML フィールド解説
-
-```yaml
-cmd_id: cmd_050           # 連番。既存のcmdと被らないように
-
-article_request:
-  topic:        # 記事テーマ。具体的に書くほど品質が上がる
-  topic_area:   # splunk / ad_attack / nutanix / riss / general から選ぶ
-  target_reader: # 誰向けか。「エンジニア一般」は不可。具体的に書く
-  notes:        # 特に含めたい内容・禁止事項など。なければ空文字 ""
-```
-
-### `topic_area` の選び方
+### `--type` の選び方
 
 | 値 | 使う場面 |
 |---|---|
@@ -109,6 +81,14 @@ article_request:
 | `nutanix` | Nutanix CE の構築・運用・トラブルシュート |
 | `riss` | RISS試験対策・過去問解説・午後問の解き方 |
 | `general` | 上記に当てはまらない汎用セキュリティ・IT話題 |
+
+### 進捗確認（Step 4）
+
+```bash
+cat dashboard.md
+```
+
+家老が `dashboard.md` の `github_url` フィールドを更新したら完了。
 
 ---
 
@@ -141,8 +121,6 @@ proposal:
 
 ### Phase 1-B: 企画一次レビュー（別の足軽）
 
-以下の項目を全てチェックする:
-
 - [ ] タイトルに検索キーワードが含まれているか
 - [ ] 対象読者が具体的か（「エンジニア一般」は不可）
 - [ ] アウトラインに「まとめ」セクションが含まれているか
@@ -150,8 +128,6 @@ proposal:
 - [ ] 筆者のトピック領域に合致しているか
 
 ### Phase 1-C: 企画軍師レビュー
-
-軍師が以下を評価して `approved` / `revision_needed` を返す:
 
 - **SEO**: タイトルのキーワードに検索需要があるか
 - **独自性**: 同テーマの記事との差別化が成立しているか
