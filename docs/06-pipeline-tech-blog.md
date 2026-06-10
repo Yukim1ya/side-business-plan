@@ -200,3 +200,50 @@ note.com への実際の投稿は手動で行う（GitHub の `.md` ファイル
 
 **Q. topic_area などを自分で指定したい場合は？**  
 `queue/tasks/cmd_blog_XXX.yaml` を直接編集してから家老に送信すれば上書き可能。
+
+---
+
+## トラブルシューティング
+
+### 家老が停止してパイプラインが進まない場合
+
+**症状**: `new_blog_article.sh` を実行してもパイプラインが進まず、`dashboard.md` が更新されない。
+
+**診断コマンド**:
+
+```bash
+# 1. 家老のinbox未読件数を確認（0より多ければ未処理メッセージあり）
+grep "read: false" queue/inbox/karo.yaml | wc -l
+
+# 2. 家老ペインの状態を確認
+tmux capture-pane -t multiagent:agents.0 -p | tail -20
+
+# 3. エージェント全体のステータスを確認
+bash scripts/agent_status.sh
+```
+
+**原因**: 家老がSession Start手順（自己識別→memory→instructions読み込み）を途中で完了せず、別エージェントのinboxを誤読するなどの誤認識状態に陥っている。
+
+**復旧手順**:
+
+```bash
+# multi-agent-shogunリポジトリで実行
+bash scripts/inbox_write.sh karo "セッションをリセットせよ。queue/inbox/karo.yamlのread:falseエントリを処理してtech_blogパイプラインを開始せよ。" clear_command shogun
+```
+
+`clear_command` タイプのメッセージを受け取ると `inbox_watcher.sh` が自動的に `/clear` を家老ペインに送信する。  
+家老は Session Start 手順に従って：
+1. 自己識別（`karo`であることを確認）
+2. memory読み込み
+3. instructions/karo.md 読み込み
+4. inbox の未読メッセージを処理してパイプライン再開
+
+**復旧確認**:
+
+```bash
+# 家老ペインで以下のようなログが出ていれば復旧成功
+tmux capture-pane -t multiagent:agents.0 -p | grep -E "(inbox|cmd_blog|Phase)"
+
+# 未読件数が0に近づいていれば処理中
+grep "read: false" queue/inbox/karo.yaml | wc -l
+```
