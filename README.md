@@ -22,3 +22,40 @@
 | C: 技術ブログ自動化 | 2〜10万円 | 低 | ★★★☆☆ |
 
 **最優先推奨: プランA**（情報処理安全確保支援士資格 × Claude Code の組み合わせが最大の差別化要因）
+
+---
+
+## スクリプト
+
+### `scripts/generate_article.py` — 技術記事生成（プランC用）
+
+Claude API で技術ブログ記事のドラフトを半自動生成する。
+
+**前提条件**:
+```bash
+pip install anthropic
+export ANTHROPIC_API_KEY="your-api-key"
+```
+
+**使い方**:
+```bash
+# Splunk 記事
+python scripts/generate_article.py --topic "Splunk SPL チートシート" --type splunk
+
+# AD攻撃検知 記事
+python scripts/generate_article.py --topic "Kerberoasting 検知" --type ad_attack
+
+# Nutanix 記事
+python scripts/generate_article.py --topic "Nutanix CE セットアップ" --type nutanix
+
+# カスタムテーマ
+python scripts/generate_article.py --topic "カスタムテーマ" --audience "インフラエンジニア"
+```
+
+生成された記事は `output/YYYYMMDD_HHMMSS_<topic>.md` に保存される。
+
+---
+
+## タスク管理
+
+[GitHub Issues](https://github.com/Yukim1ya/side-business-plan/issues) でロードマップのタスクを管理。
