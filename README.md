@@ -12,6 +12,7 @@
 | [docs/03-plan-code-review-saas.md](docs/03-plan-code-review-saas.md) | AIコードレビュー SaaS |
 | [docs/04-plan-tech-blog.md](docs/04-plan-tech-blog.md) | 技術ブログ自動生成×マネタイズ |
 | [docs/05-risks.md](docs/05-risks.md) | リスク・注意事項 |
+| [docs/06-pipeline-tech-blog.md](docs/06-pipeline-tech-blog.md) | **プランC** MASパイプライン詳細手順 |
 
 ## 推奨プランサマリー
 
