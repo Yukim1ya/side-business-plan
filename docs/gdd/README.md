@@ -4,6 +4,7 @@ ITプロジェクト管理シミュレーションゲームの設計書。
 
 | ファイル | 内容 |
 |---------|------|
+| [00-market-research.md](00-market-research.md) | **市場調査**（競合分析・差別化ポジション・SWOT） |
 | [01-parameters.md](01-parameters.md) | パラメータ設計（7コアパラメータ・計算式・勝敗条件） |
 | [02-event-cards.md](02-event-cards.md) | イベントカード20枚（2択・効果・発生確率） |
 
