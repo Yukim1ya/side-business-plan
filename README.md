@@ -13,7 +13,8 @@
 | [docs/04-plan-tech-blog.md](docs/04-plan-tech-blog.md) | プランC: 技術ブログ自動生成×マネタイズ |
 | [docs/05-risks.md](docs/05-risks.md) | リスク・注意事項 |
 | [docs/06-pipeline-tech-blog.md](docs/06-pipeline-tech-blog.md) | プランC: MASパイプライン詳細手順 |
-| [docs/07-plan-gallopia-saas.md](docs/07-plan-gallopia-saas.md) | **★NEW** プランD: 競馬AI予測SaaS（GALLOPIA商用版） |
+| [docs/07-plan-gallopia-saas.md](docs/07-plan-gallopia-saas.md) | プランD: 競馬AI予測SaaS（参考・保留中） |
+| [docs/08-plan-bishoujo-game.md](docs/08-plan-bishoujo-game.md) | **★現在注力** プランE: 美少女ゲーム開発（インディーVN） |
 
 ## プラン比較サマリー
 
@@ -22,21 +23,24 @@
 | A: セキュリティ文書生成 | 10〜30万円 | 低 | ★★☆☆☆ | ★★☆☆☆ |
 | B: コードレビュー SaaS | 5〜20万円 | 高 | ★★★★☆ | ★★★☆☆ |
 | C: 技術ブログ自動化 | 2〜10万円 | 低 | ★★☆☆☆ | ★☆☆☆☆ |
-| **D: 競馬AI予測SaaS** | **5〜20万円** | **中** | **★★★★★** | **★★★★★** |
+| D: 競馬AI予測SaaS | 5〜20万円 | 中 | ★★★★★ | ★★★★★ |
+| **E: 美少女ゲーム開発** | **1〜30万円+** | **中** | **★★★★★** | **★★★★☆** |
 
-## 推奨フェーズ
+## 現在の推奨: プランE（美少女ゲーム開発）
 
 ```
-Phase 1（今すぐ）: プランD スタート — 既存MLモデルをSaaS化
-  → GALLOPIA POCの資産（LightGBM 55特徴量）をそのまま商用利用
-  → Next.js + FastAPI + Stripe の実装でフルスタックスキル習得
-  → 月収5〜20万円を3〜6ヶ月で目指す
+Phase 1（今すぐ〜2ヶ月）: MVP制作
+  → Ren'Py + Stable Diffusion で最初の1本を完成させる
+  → キャラ1〜2人・シナリオ3万文字・CG5枚のミニゲーム
+  → DLsiteに体験版を出品して市場反応を見る
 
-Phase 2（3〜6ヶ月後）: プランA 並行スタート
-  → プランDで開発スキルを磨きながら、短期収益柱としてセキュリティ文書も受注
+Phase 2（3〜5ヶ月）: 完成版リリース・収益化
+  → シナリオ拡充・DLsite製品版販売（880〜1,980円）
+  → X（Twitter）でキャラ・制作日誌を定期投稿してファンを獲得
 
-Phase 3（6〜12ヶ月後）: プランB 開発
-  → プランD/Aで得た資金・経験をもとにコードレビューSaaSへ拡張
+Phase 3（6ヶ月〜）: Unity移行・スケールアップ
+  → Unityで本格作品を開発（Live2D・独自システム）
+  → 2本目以降でファンのリピーター化・シリーズ展開
 ```
 
 ---
